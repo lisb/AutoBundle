@@ -27,13 +27,18 @@ public class AutoBundleWriter {
     }
 
     public void write(Filer filer) throws IOException {
-        TypeSpec clazz = TypeSpec.classBuilder(bindingClass.getHelperClassName())
+        TypeSpec.Builder builder = TypeSpec.classBuilder(bindingClass.getHelperClassName())
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-                .addType(createBuilderClass(bindingClass))
-                .addMethod(createCallBuilderMethod(bindingClass))
-                .addMethod(createBindMethod(bindingClass))
+                .addType(createBuilderClass(bindingClass));
+
+        if (!bindingClass.isAbstractIntentBuilder()) {
+            builder.addMethod(createCallBuilderMethod(bindingClass));
+        }
+
+        builder.addMethod(createBindMethod(bindingClass))
                 .addMethod(createBindWithSourceMethod(bindingClass))
-                .addMethod(createPackMethod(bindingClass))
+                .addMethod(createPackMethod(bindingClass));
+        TypeSpec clazz = builder
                 .build();
         JavaFile.builder(bindingClass.getPackageName(), clazz)
                 .build()
@@ -63,13 +68,19 @@ public class AutoBundleWriter {
     }
 
     private static TypeSpec createBuilderClass(AutoBundleBindingClass target) {
-        return TypeSpec.classBuilder(target.getBuilderClassName())
-                .addModifiers(Modifier.PUBLIC, Modifier.FINAL, Modifier.STATIC)
+        TypeSpec.Builder builder = TypeSpec.classBuilder(target.getBuilderClassName())
                 .addField(createField(FIELD_BUNDLE_NAME))
                 .addMethod(createBuilderConstructor(target, FIELD_BUNDLE_NAME))
                 .addMethods(createBuilderMethods(target, FIELD_BUNDLE_NAME))
-                .addMethods(createBuildMethods(target, FIELD_BUNDLE_NAME))
-                .build();
+                .addMethods(createBuildMethods(target, FIELD_BUNDLE_NAME));
+
+        if (target.isAbstractIntentBuilder()) {
+            builder.addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT, Modifier.STATIC);
+        } else {
+            builder.addModifiers(Modifier.PUBLIC, Modifier.FINAL, Modifier.STATIC);
+        }
+
+        return builder.build();
     }
 
     private static MethodSpec createBuilderConstructor(AutoBundleBindingClass target,
