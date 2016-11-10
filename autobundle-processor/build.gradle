@@ -29,3 +29,8 @@ publish {
     repository = metadata.repository
     licences = metadata.licences
 }
+
+apply plugin: 'com.github.dcendents.android-maven'
+archivesBaseName = 'autobundle-processor'
+group = 'com.lisb.android'
+version = metadata.version
