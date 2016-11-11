@@ -1,7 +1,7 @@
 package com.yatatsu.autobundle.processor;
 
 import com.squareup.javapoet.ClassName;
-import com.yatatsu.autobundle.AbstractIntentBuilder;
+import com.yatatsu.autobundle.AbstractAutoBundle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +49,7 @@ public class AutoBundleBindingClass {
         }
     }
 
-    private final boolean abstractIntentBuilder;
+    private final boolean abstractAutoBundle;
     private final ClassName targetType;
     private final String packageName;
     private final String className;
@@ -60,7 +60,7 @@ public class AutoBundleBindingClass {
     public AutoBundleBindingClass(TypeElement typeElement,
                                   Elements elementsUtils,
                                   Types typeUtils) {
-        this.abstractIntentBuilder = typeElement.getAnnotation(AbstractIntentBuilder.class) != null;
+        this.abstractAutoBundle = typeElement.getAnnotation(AbstractAutoBundle.class) != null;
         this.targetType = ClassName.get(typeElement);
         Validator.checkAutoBundleTargetModifier(typeElement);
         this.packageName = BindingDetector.getPackageName(elementsUtils, typeElement);
@@ -77,8 +77,8 @@ public class AutoBundleBindingClass {
         Validator.checkDuplicatedArgsKey(args);
     }
 
-    public boolean isAbstractIntentBuilder() {
-        return abstractIntentBuilder;
+    public boolean isAbstractAutoBundle() {
+        return abstractAutoBundle;
     }
 
     public ClassName getTargetType() {
@@ -107,5 +107,9 @@ public class AutoBundleBindingClass {
 
     public String getHelperClassName() {
         return className + "AutoBundle";
+    }
+
+    public String getAbstractHelperClassName() {
+        return "Abstract" + getHelperClassName();
     }
 }

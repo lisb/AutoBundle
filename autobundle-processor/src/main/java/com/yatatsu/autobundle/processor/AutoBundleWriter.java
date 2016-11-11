@@ -27,11 +27,14 @@ public class AutoBundleWriter {
     }
 
     public void write(Filer filer) throws IOException {
-        TypeSpec.Builder builder = TypeSpec.classBuilder(bindingClass.getHelperClassName())
-                .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-                .addType(createBuilderClass(bindingClass));
+        TypeSpec.Builder builder = TypeSpec.classBuilder(bindingClass.isAbstractAutoBundle()
+                ? bindingClass.getAbstractHelperClassName() : bindingClass.getHelperClassName());
+        builder.addType(createBuilderClass(bindingClass));
 
-        if (!bindingClass.isAbstractIntentBuilder()) {
+        if (bindingClass.isAbstractAutoBundle()) {
+            builder.addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT);
+        } else {
+            builder.addModifiers(Modifier.PUBLIC, Modifier.FINAL);
             builder.addMethod(createCallBuilderMethod(bindingClass));
         }
 
@@ -46,7 +49,8 @@ public class AutoBundleWriter {
     }
 
     private static ClassName getBuilderClassName(AutoBundleBindingClass target) {
-        return ClassName.get(target.getHelperClassName(), target.getBuilderClassName());
+        return ClassName.get(target.isAbstractAutoBundle() ? target.getAbstractHelperClassName()
+                : target.getHelperClassName(), target.getBuilderClassName());
     }
 
     private static MethodSpec createCallBuilderMethod(AutoBundleBindingClass target) {
@@ -74,7 +78,7 @@ public class AutoBundleWriter {
                 .addMethods(createBuilderMethods(target, FIELD_BUNDLE_NAME))
                 .addMethods(createBuildMethods(target, FIELD_BUNDLE_NAME));
 
-        if (target.isAbstractIntentBuilder()) {
+        if (target.isAbstractAutoBundle()) {
             builder.addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT, Modifier.STATIC);
         } else {
             builder.addModifiers(Modifier.PUBLIC, Modifier.FINAL, Modifier.STATIC);
