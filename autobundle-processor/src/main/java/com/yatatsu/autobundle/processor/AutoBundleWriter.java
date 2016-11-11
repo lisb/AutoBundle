@@ -42,11 +42,48 @@ public class AutoBundleWriter {
         builder.addMethod(createBindMethod(bindingClass))
                 .addMethod(createBindWithSourceMethod(bindingClass))
                 .addMethod(createPackMethod(bindingClass));
+
+        for (AutoBundleBindingField field : bindingClass.getRequiredArgs()) {
+            if ((field.getFlags() & AutoBundleField.FLAG_GENERATE_GETTER) > 0) {
+                builder.addMethod(createGetter(field));
+            }
+        }
+
+        for (AutoBundleBindingField field : bindingClass.getNotRequiredArgs()) {
+            if ((field.getFlags() & AutoBundleField.FLAG_GENERATE_GETTER) > 0) {
+                builder.addMethod(createGetter(field));
+            }
+        }
+
         TypeSpec clazz = builder
                 .build();
         JavaFile.builder(bindingClass.getPackageName(), clazz)
                 .build()
                 .writeTo(filer);
+    }
+
+    private static MethodSpec createGetter(AutoBundleBindingField arg) {
+        String key = arg.getArgKey();
+        TypeName argType = arg.getArgType();
+        String opName = arg.getOperationName("get");
+
+        MethodSpec.Builder builder =
+                MethodSpec.methodBuilder("get" + Character.toUpperCase(key.charAt(0))
+                        + key.substring(1))
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addParameter(CLASS_BUNDLE, "source").returns(arg.getArgType());
+        if (arg.hasCustomConverter()) {
+            TypeName converter = arg.getConverter();
+            builder.addStatement("return ($T) new $T().original( source.$N($S) )",
+                    argType, converter, opName, key);
+        } else {
+            if (arg.noCast()) {
+                builder.addStatement("return source.$N($S)", opName, key);
+            } else {
+                builder.addStatement("return ($T) source.$N($S)", argType, opName, key);
+            }
+        }
+        return builder.build();
     }
 
     private static ClassName getBuilderClassName(AutoBundleBindingClass target) {

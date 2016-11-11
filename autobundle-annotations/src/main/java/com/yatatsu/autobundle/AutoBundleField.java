@@ -14,4 +14,5 @@ public @interface AutoBundleField {
     int flags() default 0;
 
     int FLAG_NO_BUILDER_PARAMETER = 1;
+    int FLAG_GENERATE_GETTER = 2;
 }
