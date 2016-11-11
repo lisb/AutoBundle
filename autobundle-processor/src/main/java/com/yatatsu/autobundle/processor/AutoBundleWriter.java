@@ -6,6 +6,7 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
+import com.yatatsu.autobundle.AutoBundleField;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -60,13 +61,17 @@ public class AutoBundleWriter {
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(builderClass)
                 .addCode("return new $T(", builderClass);
+        boolean hasParameter = false;
         for (int i = 0, count = target.getRequiredArgs().size(); i < count; i++) {
-            if (i > 0) {
-                builder.addCode(",");
-            }
             AutoBundleBindingField arg = target.getRequiredArgs().get(i);
-            builder.addParameter(arg.getArgType(), arg.getArgKey())
-                    .addCode("$N", arg.getArgKey());
+            if ((arg.getFlags() & AutoBundleField.FLAG_NO_BUILDER_PARAMETER) == 0) {
+                if (hasParameter) {
+                    builder.addCode(",");
+                }
+                hasParameter = true;
+                builder.addParameter(arg.getArgType(), arg.getArgKey())
+                        .addCode("$N", arg.getArgKey());
+            }
         }
         return builder.addCode(");\n").build();
     }
@@ -94,6 +99,10 @@ public class AutoBundleWriter {
                 .addStatement("this.$N = new $T()", fieldName, CLASS_BUNDLE);
 
         for (AutoBundleBindingField arg : target.getRequiredArgs()) {
+            if ((arg.getFlags() & AutoBundleField.FLAG_NO_BUILDER_PARAMETER) > 0) {
+                continue;
+            }
+
             String key = arg.getArgKey();
             TypeName type = arg.getArgType();
             String operationName = arg.getOperationName("put");
@@ -119,6 +128,10 @@ public class AutoBundleWriter {
                                                          String fieldName) {
         List<MethodSpec> methodSpecs = new ArrayList<>();
         for (AutoBundleBindingField arg : target.getNotRequiredArgs()) {
+            if ((arg.getFlags() & AutoBundleField.FLAG_NO_BUILDER_PARAMETER) > 0) {
+                continue;
+            }
+
             String argKey = arg.getArgKey();
             TypeName argType = arg.getArgType();
             String operationName = arg.getOperationName("put");
