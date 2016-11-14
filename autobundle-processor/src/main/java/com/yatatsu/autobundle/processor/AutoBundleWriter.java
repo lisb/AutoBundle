@@ -1,5 +1,6 @@
 package com.yatatsu.autobundle.processor;
 
+import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
@@ -30,6 +31,8 @@ public class AutoBundleWriter {
         TypeSpec.Builder builder = TypeSpec.classBuilder(bindingClass.isAbstract()
                 ? bindingClass.getAbstractHelperClassName() : bindingClass.getHelperClassName());
         builder.addType(createBuilderClass(bindingClass));
+        builder.addAnnotation(AnnotationSpec.builder(SuppressWarnings.class)
+                .addMember("value", "$S", "unchecked").build());
 
         if (bindingClass.isAbstract()) {
             builder.addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT);

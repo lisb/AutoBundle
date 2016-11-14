@@ -12,6 +12,7 @@ import com.yatatsu.autobundle.AutoBundleGetter;
 import com.yatatsu.autobundle.AutoBundleSetter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class ExampleActivity extends AppCompatActivity {
@@ -46,6 +47,9 @@ public class ExampleActivity extends AppCompatActivity {
     @AutoBundleField(generateGetter = true, required = false,
             converter = ParcelableConverter.class)
     ExampleData exampleData3;
+
+    @AutoBundleField(required = false)
+    HashMap<HashMap<String, String>, String> map;
 
     String getName() {
         return name;

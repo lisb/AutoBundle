@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.lang.model.element.TypeElement;
@@ -78,15 +79,7 @@ public class BindingFieldHelper {
             }
         }
 
-        String[] splits = detectTypeArgument(target.toString());
-        TypeMirror targetType;
-        if (splits.length == 1) {
-            targetType = elements.getTypeElement(target.toString()).asType();
-        } else {
-            TypeElement genericType = elements.getTypeElement(splits[0]);
-            TypeMirror argType = elements.getTypeElement(splits[1]).asType();
-            targetType = types.getDeclaredType(genericType, argType);
-        }
+        TypeMirror targetType = getTypeMirror(target, elements, types);
 
         // Parcelable
         if (types.isAssignable(targetType, parcelable)) {
@@ -123,11 +116,21 @@ public class BindingFieldHelper {
         return null;
     }
 
-    static String[] detectTypeArgument(String typeName) {
-        if (typeName.matches("^(.+)<(.+)>$")) {
-            return typeName.substring(0, typeName.length() - 1).split("<");
+    static TypeMirror getTypeMirror(TypeName target, Elements elements, Types types) {
+        if (target instanceof ParameterizedTypeName) {
+            final ParameterizedTypeName parameterizedTypeName = (ParameterizedTypeName) target;
+            final TypeElement genericType = elements.getTypeElement(
+                    parameterizedTypeName.rawType.toString());
+            final List<TypeName> typeArguments = parameterizedTypeName.typeArguments;
+            final TypeMirror[] argTypes = new TypeMirror[typeArguments.size()];
+            for (int i = 0; i < argTypes.length; i++) {
+                final TypeName typeArgument = typeArguments.get(i);
+                argTypes[i] = getTypeMirror(typeArgument, elements, types);
+            }
+            return types.getDeclaredType(genericType, argTypes);
         } else {
-            return new String[]{typeName};
+            return elements.getTypeElement(target.toString()).asType();
         }
     }
+
 }
