@@ -44,13 +44,13 @@ public class AutoBundleWriter {
                 .addMethod(createPackMethod(bindingClass));
 
         for (AutoBundleBindingField field : bindingClass.getRequiredArgs()) {
-            if ((field.getFlags() & AutoBundleField.FLAG_GENERATE_GETTER) > 0) {
+            if (field.isGenerateGetter()) {
                 builder.addMethod(createGetter(field));
             }
         }
 
         for (AutoBundleBindingField field : bindingClass.getNotRequiredArgs()) {
-            if ((field.getFlags() & AutoBundleField.FLAG_GENERATE_GETTER) > 0) {
+            if (field.isGenerateGetter()) {
                 builder.addMethod(createGetter(field));
             }
         }
@@ -101,7 +101,7 @@ public class AutoBundleWriter {
         boolean hasParameter = false;
         for (int i = 0, count = target.getRequiredArgs().size(); i < count; i++) {
             AutoBundleBindingField arg = target.getRequiredArgs().get(i);
-            if ((arg.getFlags() & AutoBundleField.FLAG_NO_BUILDER_PARAMETER) == 0) {
+            if (arg.isGenerateBuildParam()) {
                 if (hasParameter) {
                     builder.addCode(",");
                 }
@@ -136,7 +136,7 @@ public class AutoBundleWriter {
                 .addStatement("this.$N = new $T()", fieldName, CLASS_BUNDLE);
 
         for (AutoBundleBindingField arg : target.getRequiredArgs()) {
-            if ((arg.getFlags() & AutoBundleField.FLAG_NO_BUILDER_PARAMETER) > 0) {
+            if (!arg.isGenerateBuildParam()) {
                 continue;
             }
 
@@ -165,7 +165,7 @@ public class AutoBundleWriter {
                                                          String fieldName) {
         List<MethodSpec> methodSpecs = new ArrayList<>();
         for (AutoBundleBindingField arg : target.getNotRequiredArgs()) {
-            if ((arg.getFlags() & AutoBundleField.FLAG_NO_BUILDER_PARAMETER) > 0) {
+            if (!arg.isGenerateBuildParam()) {
                 continue;
             }
 

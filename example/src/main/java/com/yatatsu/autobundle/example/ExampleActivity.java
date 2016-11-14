@@ -34,16 +34,16 @@ public class ExampleActivity extends AppCompatActivity {
     @AutoBundleField(required = false, converter = ParcelableConverter.class)
     ExampleData exampleData2;
 
-    @AutoBundleField(flags = AutoBundleField.FLAG_NO_BUILDER_PARAMETER)
+    @AutoBundleField(generateBuilderParam = false)
     String state;
 
-    @AutoBundleField(flags = AutoBundleField.FLAG_GENERATE_GETTER|AutoBundleField.FLAG_NO_BUILDER_PARAMETER)
+    @AutoBundleField(generateGetter = true, generateBuilderParam = false)
     String name2;
 
-    @AutoBundleField(flags = AutoBundleField.FLAG_GENERATE_GETTER|AutoBundleField.FLAG_NO_BUILDER_PARAMETER)
+    @AutoBundleField(generateGetter = true, generateBuilderParam = false)
     ArrayList<Person> person2;
 
-    @AutoBundleField(flags = AutoBundleField.FLAG_GENERATE_GETTER, required = false,
+    @AutoBundleField(generateGetter = true, required = false,
             converter = ParcelableConverter.class)
     ExampleData exampleData3;
 

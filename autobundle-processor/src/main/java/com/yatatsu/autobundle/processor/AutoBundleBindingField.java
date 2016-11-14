@@ -28,9 +28,10 @@ public class AutoBundleBindingField {
     private final TypeName converter;
     private final boolean hasCustomConverter;
     private final String operationName;
+    private final boolean generateBuildParam;
+    private final boolean generateGetter;
     private String getterName;
     private String setterName;
-    private final int flags;
 
     public AutoBundleBindingField(VariableElement element,
                                   AutoBundleField annotation,
@@ -40,9 +41,9 @@ public class AutoBundleBindingField {
                                   String setterName) {
         this.fieldName = element.toString();
         this.argKey = annotation.key().length() > 0 ? annotation.key() : this.fieldName;
-        this.flags = annotation.flags();
-        this.required = (this.flags & AutoBundleField.FLAG_NO_BUILDER_PARAMETER) == 0
-                && annotation.required();
+        this.generateBuildParam = annotation.generateBuilderParam();
+        this.generateGetter = annotation.generateGetter();
+        this.required = generateBuildParam && annotation.required();
         this.argType = TypeName.get(element.asType());
         this.getterName = getterName;
         this.setterName = setterName;
@@ -122,8 +123,12 @@ public class AutoBundleBindingField {
         return setterName != null && setterName.length() > 0;
     }
 
-    public int getFlags() {
-        return flags;
+    public boolean isGenerateBuildParam() {
+        return generateBuildParam;
+    }
+
+    public boolean isGenerateGetter() {
+        return generateGetter;
     }
 
     public boolean noCast() {

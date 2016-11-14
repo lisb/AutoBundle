@@ -11,8 +11,6 @@ public @interface AutoBundleField {
     boolean required() default true;
     String key() default "";
     Class<? extends AutoBundleConverter> converter() default DefaultAutoBundleConverter.class;
-    int flags() default 0;
-
-    int FLAG_NO_BUILDER_PARAMETER = 1;
-    int FLAG_GENERATE_GETTER = 2;
+    boolean generateBuilderParam() default true;
+    boolean generateGetter() default false;
 }
