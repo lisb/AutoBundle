@@ -6,7 +6,6 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
-import com.yatatsu.autobundle.AutoBundleField;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,11 +27,11 @@ public class AutoBundleWriter {
     }
 
     public void write(Filer filer) throws IOException {
-        TypeSpec.Builder builder = TypeSpec.classBuilder(bindingClass.isAbstractAutoBundle()
+        TypeSpec.Builder builder = TypeSpec.classBuilder(bindingClass.isAbstract()
                 ? bindingClass.getAbstractHelperClassName() : bindingClass.getHelperClassName());
         builder.addType(createBuilderClass(bindingClass));
 
-        if (bindingClass.isAbstractAutoBundle()) {
+        if (bindingClass.isAbstract()) {
             builder.addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT);
         } else {
             builder.addModifiers(Modifier.PUBLIC, Modifier.FINAL);
@@ -87,7 +86,7 @@ public class AutoBundleWriter {
     }
 
     private static ClassName getBuilderClassName(AutoBundleBindingClass target) {
-        return ClassName.get(target.isAbstractAutoBundle() ? target.getAbstractHelperClassName()
+        return ClassName.get(target.isAbstract() ? target.getAbstractHelperClassName()
                 : target.getHelperClassName(), target.getBuilderClassName());
     }
 
@@ -120,7 +119,7 @@ public class AutoBundleWriter {
                 .addMethods(createBuilderMethods(target, FIELD_BUNDLE_NAME))
                 .addMethods(createBuildMethods(target, FIELD_BUNDLE_NAME));
 
-        if (target.isAbstractAutoBundle()) {
+        if (target.isAbstract()) {
             builder.addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT, Modifier.STATIC);
         } else {
             builder.addModifiers(Modifier.PUBLIC, Modifier.FINAL, Modifier.STATIC);

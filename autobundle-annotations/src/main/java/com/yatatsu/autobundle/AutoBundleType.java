@@ -7,5 +7,6 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.CLASS)
-public @interface AbstractAutoBundle {
+public @interface AutoBundleType {
+    boolean isAbstract() default false;
 }

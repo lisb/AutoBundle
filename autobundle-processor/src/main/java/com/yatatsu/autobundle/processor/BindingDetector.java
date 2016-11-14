@@ -4,6 +4,7 @@ package com.yatatsu.autobundle.processor;
 import com.yatatsu.autobundle.AutoBundleField;
 import com.yatatsu.autobundle.AutoBundleGetter;
 import com.yatatsu.autobundle.AutoBundleSetter;
+import com.yatatsu.autobundle.AutoBundleType;
 import com.yatatsu.autobundle.processor.exceptions.UnsupportedClassException;
 
 import java.util.ArrayList;
@@ -27,8 +28,8 @@ final class BindingDetector {
                                                        Types typeUtils) {
         ArrayList<AutoBundleBindingClass> bindingClasses = new ArrayList<>();
         Set<String> keySet = new HashSet<>();
-        Set<? extends Element> elements = env.getElementsAnnotatedWith(AutoBundleField.class);
-        for (Element element : elements) {
+        Set<? extends Element> autoBundleFields = env.getElementsAnnotatedWith(AutoBundleField.class);
+        for (Element element : autoBundleFields) {
             TypeElement typeElement = (TypeElement) element.getEnclosingElement();
             if (!keySet.contains(typeElement.getSimpleName().toString())) {
                 AutoBundleBindingClass bindingClass =
@@ -37,6 +38,18 @@ final class BindingDetector {
                 keySet.add(typeElement.getSimpleName().toString());
             }
         }
+
+        final Set<? extends Element> autoBundleTypes = env.getElementsAnnotatedWith(AutoBundleType.class);
+        for (Element element : autoBundleTypes) {
+            TypeElement typeElement = (TypeElement) element;
+            if (!keySet.contains(typeElement.getSimpleName().toString())) {
+                AutoBundleBindingClass bindingClass =
+                        new AutoBundleBindingClass(typeElement, elementUtils, typeUtils);
+                bindingClasses.add(bindingClass);
+                keySet.add(typeElement.getSimpleName().toString());
+            }
+        }
+
         return bindingClasses;
     }
 

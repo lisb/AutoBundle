@@ -2,10 +2,11 @@ package com.yatatsu.autobundle.processor;
 
 import com.google.auto.service.AutoService;
 import com.yatatsu.autobundle.AutoBundleField;
+import com.yatatsu.autobundle.AutoBundleType;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -40,7 +41,10 @@ public class AutoBundleProcessor extends AbstractProcessor {
 
     @Override
     public Set<String> getSupportedAnnotationTypes() {
-        return Collections.singleton(AutoBundleField.class.getCanonicalName());
+        final Set<String> supportedAnnotationTypes = new HashSet<>();
+        supportedAnnotationTypes.add(AutoBundleType.class.getCanonicalName());
+        supportedAnnotationTypes.add(AutoBundleField.class.getCanonicalName());
+        return supportedAnnotationTypes;
     }
 
     @Override
