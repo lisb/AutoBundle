@@ -1,6 +1,6 @@
 package com.yatatsu.autobundle.example;
 
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.yatatsu.autobundle.AutoBundleField;
 import com.yatatsu.autobundle.AutoBundleType;
