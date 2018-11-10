@@ -7,16 +7,16 @@ targetCompatibility = JavaVersion.VERSION_1_8
 sourceCompatibility = JavaVersion.VERSION_1_8
 
 dependencies {
-    compile project(':autobundle-annotations')
-    compile 'com.google.auto.service:auto-service:1.0-rc2'
-    compile 'com.squareup:javapoet:1.7.0'
+    implementation project(':autobundle-annotations')
+    implementation 'com.google.auto.service:auto-service:1.0-rc2'
+    implementation 'com.squareup:javapoet:1.7.0'
 
-    testCompile 'junit:junit:4.12'
-    testCompile 'com.google.truth:truth:0.27'
-    testCompile 'com.google.android:android:4.1.1.4'
-    testCompile 'com.google.android:support-v4:r7'
-    testCompile 'com.google.testing.compile:compile-testing:0.8'
-    testCompile files(Jvm.current().getToolsJar())
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'com.google.truth:truth:0.27'
+    testImplementation 'com.google.android:android:4.1.1.4'
+    testImplementation 'com.google.android:support-v4:r7'
+    testImplementation 'com.google.testing.compile:compile-testing:0.8'
+    testImplementation files(Jvm.current().getToolsJar())
 }
 
 publish {
