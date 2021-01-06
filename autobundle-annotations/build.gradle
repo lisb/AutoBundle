@@ -1,20 +1,36 @@
 apply plugin: 'java'
-apply plugin: 'com.novoda.bintray-release'
+apply plugin: 'maven-publish'
 
 targetCompatibility = JavaVersion.VERSION_1_7
 sourceCompatibility = JavaVersion.VERSION_1_7
 
-publish {
-    groupId = metadata.groupId
-    artifactId = 'autobundle-annotations'
-    desc = 'annotations for AutoBundle'
-    publishVersion = metadata.version
-    website = metadata.website
-    repository = metadata.repository
-    licences = metadata.licences
+task sourcesJar(type: Jar, dependsOn: classes) {
+    archiveClassifier.set('sources')
+    from sourceSets.main.allSource
 }
 
-apply plugin: 'com.github.dcendents.android-maven'
-archivesBaseName = 'autobundle-annotations'
-group = 'com.lisb.android'
-version = metadata.version
+publishing {
+    repositories {
+        maven {
+            name = repository_name
+            url = repository_url
+            credentials {
+                username = localProps["gpr.user"] ?: System.getenv("GPR_USER")
+                password = localProps["gpr.key"] ?: System.getenv("GPR_KEY")
+            }
+        }
+    }
+    publications {
+        release(MavenPublication) {
+            from components.java
+            artifact tasks.sourcesJar
+            groupId = metadata.groupId
+            artifactId = 'autobundle-annotations'
+            version = metadata.version
+            pom {
+                description = 'annotations for AutoBundle'
+                url = metadata.website
+            }
+        }
+    }
+}

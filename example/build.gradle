@@ -1,15 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion rootProject.ext.sdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
+    compileSdkVersion android_compile_sdk_version
+    buildToolsVersion android_build_tools_version
 
     defaultConfig {
         applicationId "com.yatatsu.autobundle.example"
-        minSdkVersion 16
-        targetSdkVersion rootProject.ext.sdkVersion
+        minSdkVersion android_min_sdk_version
+        targetSdkVersion android_target_sdk_version
         versionCode 1
-        versionName "1.0"
+        versionName metadata.version
     }
     buildTypes {
         release {

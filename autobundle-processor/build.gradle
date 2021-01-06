@@ -1,7 +1,7 @@
 import org.gradle.internal.jvm.Jvm
 
 apply plugin: 'java'
-apply plugin: 'com.novoda.bintray-release'
+apply plugin: 'maven-publish'
 
 targetCompatibility = JavaVersion.VERSION_1_8
 sourceCompatibility = JavaVersion.VERSION_1_8
@@ -9,6 +9,7 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 dependencies {
     implementation project(':autobundle-annotations')
     implementation 'com.google.auto.service:auto-service:1.0-rc2'
+    annotationProcessor 'com.google.auto.service:auto-service:1.0-rc2'
     implementation 'com.squareup:javapoet:1.7.0'
 
     testImplementation 'junit:junit:4.12'
@@ -19,18 +20,33 @@ dependencies {
     testImplementation files(Jvm.current().getToolsJar())
 }
 
-publish {
-    def metadata = rootProject.ext.metadata
-    groupId = metadata.groupId
-    artifactId = 'autobundle-processor'
-    desc = metadata.desc
-    publishVersion = metadata.version
-    website = metadata.website
-    repository = metadata.repository
-    licences = metadata.licences
+task sourcesJar(type: Jar, dependsOn: classes) {
+    archiveClassifier.set('sources')
+    from sourceSets.main.allSource
 }
 
-apply plugin: 'com.github.dcendents.android-maven'
-archivesBaseName = 'autobundle-processor'
-group = 'com.lisb.android'
-version = metadata.version
+publishing {
+    repositories {
+        maven {
+            name = repository_name
+            url = repository_url
+            credentials {
+                username = localProps["gpr.user"] ?: System.getenv("GPR_USER")
+                password = localProps["gpr.key"] ?: System.getenv("GPR_KEY")
+            }
+        }
+    }
+    publications {
+        release(MavenPublication) {
+            from components.java
+            artifact tasks.sourcesJar
+            groupId = metadata.groupId
+            artifactId = 'autobundle-processor'
+            version = metadata.version
+            pom {
+                description = metadata.desc
+                url = metadata.website
+            }
+        }
+    }
+}
